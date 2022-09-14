@@ -28,7 +28,7 @@ export class TokenInterceptor implements HttpInterceptor {
         }
 
         return next.handle(updatedTokenRequest).pipe(catchError(error => {
-            if (error instanceof HttpErrorResponse && error.status === 403) {
+            if (error instanceof HttpErrorResponse && error.status === 401) {
                 return this.handleAuthErrors(req, next);
             } else {
                 return throwError(() => error);
@@ -37,6 +37,7 @@ export class TokenInterceptor implements HttpInterceptor {
     }
     
     private handleAuthErrors(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        console.log('ran');
         if (!this.isTokenRefreshing) {
             this.isTokenRefreshing = true
             this.refreshTokenSubject.next(null);
