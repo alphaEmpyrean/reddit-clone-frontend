@@ -35,7 +35,10 @@
                         </span>   
                         <div class="login-failed" *ngIf='this.isError'>
                              <p class="login-failed-text">Login Failed. Please check your credentials and try again.</p>   
-                        </div>                     
+                        </div>
+                        <div class="login-failed" [ngStyle]="{'backgroung-color': 'green'}" *ngIf="this.registerSuccessMessage !== ''">
+                            <p class="register-success-text">{{registerSuccessMessage}}</p>
+                        </div>             
                     </form>
                 </div>
             </div>

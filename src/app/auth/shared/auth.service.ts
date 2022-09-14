@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 
 import { SignupRequestPayload } from '../signup/signup-request.payload';
 import { LoginRequestPayload } from '../login/login-request.payload';
@@ -12,8 +12,35 @@ import { LocalStorageService } from 'src/app/shared/local-storage.service';
 })
 export class AuthService {
 
+  refreshTokenPayload = {
+    refreshToken: this.getRefreshToken(),
+    username: this.getUserName()        
+  }
+
   constructor(private httpClient: HttpClient,
     private localStorage: LocalStorageService) { }
+
+  refreshToken() {
+      return this.httpClient.post<LoginResponse>('http://localhost:8080/api/auth/refresh/token',
+        this.refreshTokenPayload).pipe(
+          tap(response => {
+            this.localStorage.remove('authenticationToken');
+            this.localStorage.remove('expiresAt');
+
+            this.localStorage.set('authenticationToken', response.authenticationToken);
+            this.localStorage.set('expiresAt', response.expiresAt.toString());
+          })
+        )
+  }
+  getUserName() {
+    return this.localStorage.get('username');
+  }
+  getRefreshToken() {
+    return this.localStorage.get('refreshToken');
+  }
+  getJwtToken() {
+      return this.localStorage.get('authenticationToken');
+  }
 
   signup(signupRequestPayload: SignupRequestPayload): Observable<any> {
     return this.httpClient.post('http://localhost:8080/api/auth/signup', signupRequestPayload, {responseType: 'text'});
@@ -22,6 +49,7 @@ export class AuthService {
   login(loginRequestPayload: LoginRequestPayload): Observable<boolean> {
     return this.httpClient.post<LoginResponse>('http://localhost:8080/api/auth/login', loginRequestPayload)
       .pipe(map(data => {
+        console.log(data.authenticationToken);
         this.localStorage.set('authenticationToken', data.authenticationToken);
         this.localStorage.set('username', data.username);
         this.localStorage.set('refreshToken', data.refreshToken);
