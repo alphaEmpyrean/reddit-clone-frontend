@@ -17,6 +17,10 @@ export class PostService {
     return this.http.get<Array<PostModel>>('http://localhost:8080/api/post/');
   }
 
+  getPost(postId: number): Observable<PostModel> {
+    return this.http.get<PostModel>('http://localhost:8080/api/post/' + postId);
+  }
+
   createPost(postPayload: CreatePostPayload): Observable<any> {
     return this.http.post('http://localhost:8080/api/post', postPayload);
   }
