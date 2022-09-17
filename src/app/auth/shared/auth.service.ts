@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, tap, throwError } from 'rxjs';
 
@@ -11,6 +11,11 @@ import { LocalStorageService } from 'src/app/shared/local-storage.service';
   providedIn: 'root'
 })
 export class AuthService {
+
+  @Output()
+  loggedIn: EventEmitter<boolean> = new EventEmitter();
+  @Output()
+  username: EventEmitter<string> = new EventEmitter();
 
   refreshTokenPayload = {
     refreshToken: this.getRefreshToken(),
@@ -55,6 +60,9 @@ export class AuthService {
         this.localStorage.set('username', data.username);
         this.localStorage.set('refreshToken', data.refreshToken);
         this.localStorage.set('expiresAt', data.expiresAt.toString());
+
+        this.loggedIn.emit(true);
+        this.username.emit(data.username);
 
         return true;
       }));
