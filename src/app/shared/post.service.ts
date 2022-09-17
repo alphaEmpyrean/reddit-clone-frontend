@@ -24,4 +24,8 @@ export class PostService {
   createPost(postPayload: CreatePostPayload): Observable<any> {
     return this.http.post('http://localhost:8080/api/post', postPayload);
   }
+
+  getAllPostsByUser(name: string): Observable<any> {
+    return this.http.get<PostModel[]>('http://localhost:8080/api/post/by-user/' + name);
+  }
 }
